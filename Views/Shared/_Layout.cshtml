@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - River High</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/app.css" />
+    <link rel="icon" type="image/png" href="~/river-high-logo.png" />
+</head>
+<body>
+    @*fixed navbar at the top of the page*@
+    @*background color comes from the bs-primary css variable that app.css overrides to navy*@
+    @*align-self-start on the brand pushes the logo to the top edge of the navbar*@
+    @*the logo is taller than the navbar so it overflows downward into the page*@
+    <nav class="navbar navbar-dark fixed-top px-4 py-0 school-navbar" style="background-color: var(--bs-primary); height: 170px;">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center align-self-start" href="/">
+                <img src="~/river-high-logo.png" alt="Riverside High School logo" class="school-logo me-3" />
+                <span class="h2 mb-0">Riverside High Student Portal</span>
+            </a>
+            @*the school name acts as the home link so we drop the redundant home nav item*@
+            @*bootstrap icons add a small visual cue next to each link*@
+            <div class="d-flex gap-4">
+                <a class="nav-link text-white" href="#"><i class="bi bi-mortarboard me-1"></i>Classes</a>
+                <a class="nav-link text-white" href="#"><i class="bi bi-calendar3 me-1"></i>Calendar</a>
+                <a class="nav-link text-white" href="#"><i class="bi bi-envelope me-1"></i>Messages</a>
+            </div>
+        </div>
+    </nav>
+
+    @*padding-top clears the navbar height plus the logo overhang so page content does not collide with it*@
+    <main style="padding-top: 230px;">
+        @RenderBody()
+    </main>
+
+    @*shrink-on-scroll. when the user scrolls past the threshold the navbar gets a scrolled class*@
+    @*the css transitions handle the visual change. no external library needed*@
+    <script>
+        (function () {
+            var nav = document.querySelector('.school-navbar');
+            window.addEventListener('scroll', function () {
+                if (window.scrollY > 60) {
+                    nav.classList.add('scrolled');
+                } else {
+                    nav.classList.remove('scrolled');
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

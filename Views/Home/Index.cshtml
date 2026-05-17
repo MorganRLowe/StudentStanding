@@ -1,0 +1,196 @@
+@model HomeViewModel
+@{
+    ViewData["Title"] = "Home";
+    var s = Model.Student;
+}
+
+<div class="container mt-4 pb-5">
+    @*top of the page shows the greeting, grade level, lunch balance, then maya's self-reported goal*@
+    <h1 class="h2 fw-bold">@Model.Greeting</h1>
+    <p class="text-muted mb-1">Grade @s.GradeLevel</p>
+    <p class="text-muted small mb-2">
+        Lunch Balance: $@(((decimal)s.LunchBalanceCents / 100).ToString("F2"))
+    </p>
+    @if (!string.IsNullOrWhiteSpace(s.SelfReportedGoal))
+    {
+        <p class="mb-3"><span class="text-muted small">Working toward:</span> @s.SelfReportedGoal</p>
+    }
+
+    @*left column stacks the snapshot card on top of the three collapsible detail cards*@
+    @*right column is the my classes table taking the full column height*@
+    <div class="row g-3">
+        <div class="col-12 col-md-6">
+            <div class="row g-3">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h2 class="h4 fw-bold mb-3">Snapshot</h2>
+                            @*four stats in a two-by-two grid inside the snapshot card*@
+                            <div class="row g-3">
+                                <div class="col-6 text-center">
+                                    <div class="h3 fw-bold mb-0">@Model.SubmissionPct%</div>
+                                    <small class="text-muted">turned in</small>
+                                </div>
+                                <div class="col-6 text-center">
+                                    <div class="h3 fw-bold mb-0">@Model.Missing.Count</div>
+                                    <small class="text-muted">to catch up</small>
+                                </div>
+                                <div class="col-6 text-center">
+                                    <div class="h3 fw-bold mb-0">@s.AttendancePct.ToString("0.#")%</div>
+                                    <small class="text-muted">attendance</small>
+                                </div>
+                                <div class="col-6 text-center">
+                                    <div class="h3 fw-bold mb-0">@Model.AverageGrade%</div>
+                                    <small class="text-muted">average grade</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            @*details collapse. summary doubles as the card heading and the click target*@
+                            <details>
+                                <summary class="h4 fw-bold mb-0" style="cursor: pointer;">Coming Up</summary>
+                                @if (Model.Upcoming.Count == 0)
+                                {
+                                    <p class="text-muted small mt-3 mb-0">Nothing on the calendar.</p>
+                                }
+                                else
+                                {
+                                    <ul class="list-group list-group-flush mt-3">
+                                        @foreach (var item in Model.Upcoming)
+                                        {
+                                            <li class="list-group-item px-0 d-flex align-items-center justify-content-between">
+                                                <div>
+                                                    <div>@item.Title</div>
+                                                    <small class="text-muted">@item.Subject · @item.Type</small>
+                                                </div>
+                                                <span class="badge text-bg-light">@item.Due.ToString("MMM d")</span>
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                            </details>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <details>
+                                <summary class="h4 fw-bold mb-0" style="cursor: pointer;">Recently Graded</summary>
+                                @if (Model.RecentlyGraded.Count == 0)
+                                {
+                                    <p class="text-muted small mt-3 mb-0">Nothing graded recently.</p>
+                                }
+                                else
+                                {
+                                    <ul class="list-group list-group-flush mt-3">
+                                        @foreach (var item in Model.RecentlyGraded)
+                                        {
+                                            <li class="list-group-item px-0 d-flex align-items-center justify-content-between">
+                                                <div>
+                                                    <div>@item.Title</div>
+                                                    <small class="text-muted">@item.Subject · @item.Type</small>
+                                                </div>
+                                                <span class="badge text-bg-light">@item.Score</span>
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                            </details>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <details>
+                                <summary class="h4 fw-bold mb-0" style="cursor: pointer;">Needs Attention</summary>
+                                @if (Model.Missing.Count == 0)
+                                {
+                                    <p class="text-muted small mt-3 mb-0">All caught up.</p>
+                                }
+                                else
+                                {
+                                    <ul class="list-group list-group-flush mt-3">
+                                        @foreach (var item in Model.Missing)
+                                        {
+                                            <li class="list-group-item px-0">
+                                                <div>@item.Title</div>
+                                                <small class="text-muted">@item.Subject</small>
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                            </details>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="h4 fw-bold mb-3">My Classes</h2>
+                    @*one row per class. the six classes match the six fixed grade columns in the csv*@
+                    <table class="table table-hover table-sm align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Class</th>
+                                <th class="text-end">Grade</th>
+                                <th class="text-end">Last Test</th>
+                                <th class="text-end">Class Avg</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @*the last test cell turns green when maya scored higher than the class average*@
+                            <tr>
+                                <td>English 10</td>
+                                <td class="text-end">@(s.EnglishPct.HasValue ? $"{s.EnglishPct}%" : "—")</td>
+                                <td class="text-end @(s.EnglishLastTest > s.EnglishLastTestAvg ? "text-success fw-medium" : "")">@(s.EnglishLastTest?.ToString() ?? "—")</td>
+                                <td class="text-end">@(s.EnglishLastTestAvg?.ToString() ?? "—")</td>
+                            </tr>
+                            <tr>
+                                <td>Algebra 2</td>
+                                <td class="text-end">@(s.AlgebraPct.HasValue ? $"{s.AlgebraPct}%" : "—")</td>
+                                <td class="text-end @(s.AlgebraLastTest > s.AlgebraLastTestAvg ? "text-success fw-medium" : "")">@(s.AlgebraLastTest?.ToString() ?? "—")</td>
+                                <td class="text-end">@(s.AlgebraLastTestAvg?.ToString() ?? "—")</td>
+                            </tr>
+                            <tr>
+                                <td>Chemistry</td>
+                                <td class="text-end">@(s.ChemistryPct.HasValue ? $"{s.ChemistryPct}%" : "—")</td>
+                                <td class="text-end @(s.ChemistryLastTest > s.ChemistryLastTestAvg ? "text-success fw-medium" : "")">@(s.ChemistryLastTest?.ToString() ?? "—")</td>
+                                <td class="text-end">@(s.ChemistryLastTestAvg?.ToString() ?? "—")</td>
+                            </tr>
+                            <tr>
+                                <td>History</td>
+                                <td class="text-end">@(s.HistoryPct.HasValue ? $"{s.HistoryPct}%" : "—")</td>
+                                <td class="text-end @(s.HistoryLastTest > s.HistoryLastTestAvg ? "text-success fw-medium" : "")">@(s.HistoryLastTest?.ToString() ?? "—")</td>
+                                <td class="text-end">@(s.HistoryLastTestAvg?.ToString() ?? "—")</td>
+                            </tr>
+                            <tr>
+                                <td>Spanish 2</td>
+                                <td class="text-end">@(s.SpanishPct.HasValue ? $"{s.SpanishPct}%" : "—")</td>
+                                <td class="text-end @(s.SpanishLastTest > s.SpanishLastTestAvg ? "text-success fw-medium" : "")">@(s.SpanishLastTest?.ToString() ?? "—")</td>
+                                <td class="text-end">@(s.SpanishLastTestAvg?.ToString() ?? "—")</td>
+                            </tr>
+                            <tr>
+                                <td>PE/Health</td>
+                                <td class="text-end">@(s.PePct.HasValue ? $"{s.PePct}%" : "—")</td>
+                                <td class="text-end @(s.PeLastTest > s.PeLastTestAvg ? "text-success fw-medium" : "")">@(s.PeLastTest?.ToString() ?? "—")</td>
+                                <td class="text-end">@(s.PeLastTestAvg?.ToString() ?? "—")</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
