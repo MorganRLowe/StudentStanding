@@ -1,2 +1,2 @@
 # StudentStanding
-Mock up of a student landing page 
+Academic check in page using ASP.NET Core MVC and Bootstrap 5
