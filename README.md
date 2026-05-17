@@ -7,5 +7,5 @@ Academic check in page using ASP.NET Core MVC and Bootstrap 5
 3. Run with dotnet run
 4. Open url in browser
    
-
+![Dashboard screenshot](main_screen.png)
 
